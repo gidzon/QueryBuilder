@@ -27,10 +27,7 @@ class QueryBuilder
         
         $placeholder = (!empty($placeholder)) ? $placeholder = '?,' : str_repeat('?,', $countPlaceholder);
         $placeholder = rtrim($placeholder, ',');
-        // echo '<pre>';
-        // var_dump($placeholder);
-        // echo '</pre>';
-        // exit;
+        
         
 
         try {
