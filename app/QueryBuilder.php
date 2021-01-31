@@ -8,35 +8,50 @@ use app\Database;
 
 class QueryBuilder
 {
-    protected $table;
-    protected $data;
+    
 
     public function insert($table, array $data, Database $database)
     {
         $pdo = $database->conect();
-        $this->data = $data;
-        $this->table = $table;
+        $placeholder = $this->createParametrsOfPlaceholder($data);
+        $arrayValues = $this->getArrayValues($data);
+        $arrayColumn = $this->getArrayColumns($data);
+        $column = $this->getSrtingColumns($arrayColumn);
         
-        
-        $arrayColumn = array_keys($this->data);
-        $arrayValues = array_values($this->data);
-        
-        $column = implode(",", $arrayColumn);
-        
-        $countPlaceholder = count($this->data);
-        
-        $placeholder = (!empty($placeholder)) ? $placeholder = '?,' : str_repeat('?,', $countPlaceholder);
-        $placeholder = rtrim($placeholder, ',');
-        
-        
-
         try {
-            $sql = "INSERT INTO $this->table ({$column}) VALUES({$placeholder})";
+            $sql = "INSERT INTO $table ({$column}) VALUES({$placeholder})";
             $stn = $pdo->prepare($sql);
             $stn->execute($arrayValues);
         } catch (PDOEexeption $e) {
             echo $e->getMessage();
         }
+        
+    }
+
+    public  function createParametrsOfPlaceholder(array $data)
+    {
+
+
+        $countPlaceholder = count($data);
+        
+        $placeholder = (!empty($placeholder)) ? $placeholder = '?,' : str_repeat('?,', $countPlaceholder);
+        return rtrim($placeholder, ',');
+
+    }
+
+    public function getArrayValues(array $data): array
+    {
+        return array_values($data);
+    }
+
+    public function getArrayColumns(array $data): array
+    {
+        return array_keys($data);
+    }
+
+    public function getSrtingColumns(array $arrayKeysColumn): string
+    {
+        return implode(",", $arrayKeysColumn);
         
     }
 }
