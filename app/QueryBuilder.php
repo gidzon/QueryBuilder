@@ -28,6 +28,52 @@ class QueryBuilder
         
     }
 
+    public function select($table, array $where,  Database $database): array
+    {
+        $pdo = $database->conect();
+        $placeholder = $this->createParametrsOfPlaceholder($where);
+        $arrayColumn = $this->getArrayColumns($where);
+        $arrayValues = $this->getArrayValues($where);
+        
+        if (count($arrayColumn) === 1 && !empty($where)) {
+            $whereString = "WHERE {$arrayColumn['0']} = {$arrayValues['0']}";
+            $sql = "SELECT * FROM {$table}" .' ' . $whereString;
+            
+        } elseif(count($arrayColumn) > 1 && !empty($where)) {
+            
+            $i = 1;
+            $sql = "SELECT * FROM {$table} WHERE";
+            foreach ($where as $key => $value) {
+                
+                
+                if($i === 1) {
+                    
+                    $whereString = " {$key} = {$value}";
+                    
+                } elseif($i > 1) {
+                    $whereString .= " ". "AND $key = $value";
+                } 
+                
+                $i++;
+                
+                
+            }
+            $sql .=  $whereString;
+            
+        } else {
+            $sql = "SELECT * FROM {$table}";
+            
+        }
+        
+        try {
+            $stn = $pdo->prepare($sql);
+            $stn->execute($where);
+            return $stn->fetchAll();
+        } catch (PDOExeption $e) {
+            echo $e->getMessage();
+        }
+    }
+
     public  function createParametrsOfPlaceholder(array $data)
     {
 
