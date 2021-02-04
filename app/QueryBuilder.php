@@ -97,6 +97,21 @@ class QueryBuilder
         }
     }
 
+    public function delete(string $table, array $columnsValues,  Database $database)
+    {
+        $pdo = $database->conect();
+        $column = array_keys($columnsValues);
+        $value = array_values($columnsValues);
+        $sql = "DELETE FROM {$table} WHERE {$column['0']} = ?";
+        
+        try {
+            $stn = $pdo->prepare($sql);
+            $stn->execute($value);
+        } catch (PDOExeption $e) {
+            echo $e->getMessage();
+        }
+    }
+
     public function generateParametrPlaceholder(array $columns, string $sql): string
     {
         
