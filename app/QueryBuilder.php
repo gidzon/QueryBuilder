@@ -74,6 +74,55 @@ class QueryBuilder
         }
     }
 
+    
+
+    public function update(string $table, array $columnsValues, array $where,  Database $database)
+    {
+        $pdo = $database->conect();
+        $placeholder = $this->createParametrsOfPlaceholder($columnsValues);
+        $arrayValues = $this->getArrayValues($columnsValues);
+        $arrayValuesWhere = $this->getArrayValues($where);
+        $arrayColumn = $this->getArrayColumns($columnsValues);
+        $sql = "UPDATE $table SET ";
+        $query = $this->generateParametrPlaceholder($arrayColumn, $sql);
+       
+        $arrayWhere = $this->getArrayColumns($where);
+        $query .=  " WHERE {$arrayWhere['0']} = ?";
+        $executeParametrs = array_merge($arrayValues, $arrayValuesWhere);
+        try {
+            $stn = $pdo->prepare($query);
+            $stn->execute($executeParametrs);
+        } catch (PDOExeption $e) {
+            echo $e->getMessage();
+        }
+    }
+
+    public function generateParametrPlaceholder(array $columns, string $sql): string
+    {
+        
+        $columnPlaceholder = '';
+        if (count($columns) === 1) {
+            $columnPlaceholder = "{$columns['0']} = ?";
+            return $sql .= ' ' . $columnPlaceholder;
+            
+        } elseif(count($columns) > 1) {
+            
+            $i = 1;
+            foreach ($columns as $value) {
+
+                $columnPlaceholder .= " {$value} = ?,";
+                
+                $i++;
+
+            }
+            $sql .=  $columnPlaceholder;
+            return rtrim($sql, ',');
+        }
+        
+        
+        
+    }
+
     public  function createParametrsOfPlaceholder(array $data)
     {
 
