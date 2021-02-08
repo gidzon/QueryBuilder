@@ -112,6 +112,18 @@ class QueryBuilder
         }
     }
 
+    public function query(string $sql, array $where, Database $database): array
+    {
+        $pdo = $database->conect();
+        try {
+            $stn = $pdo->prepare($sql);
+            $stn->execute($where);
+            return $stn->fetchAll();
+        } catch (PDOExeption $e) {
+            echo $e->getMessage();
+        }
+    }
+
     public function generateParametrPlaceholder(array $columns, string $sql): string
     {
         
