@@ -3,3 +3,4 @@
 /js
 !autoload.php
 .vscode
+/vendor
